@@ -1,0 +1,19 @@
+{
+    "name": "mfrouh/scope-statistics",
+    "description": "Package For Scope Statistics on model in day , month , hour, term",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MFrouh\\ScopeStatistics\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "mfrouh",
+            "email": "mohamedfrouh96@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
