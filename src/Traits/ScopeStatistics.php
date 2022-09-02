@@ -16,16 +16,17 @@ trait ScopeStatistics
             throw new Exception('Column Name Must Be String Given ' . $column);
         }
 
+        $one_query = $this->query();
         foreach ($days as $key => $value) {
-            $$value = $query->clone()->whereRaw('WEEKDAY(' . $column . ') = ' . $key)->count();
+            $q = $query->clone()->whereRaw('WEEKDAY(' . $column . ') = ' . $key)->selectRaw('count(*)')->toSql();
+            $one_query->selectRaw('(' . $q . ') as ' . $value);
         }
 
-        return compact($days);
+        return $one_query->first()->toArray();
     }
 
     public function ScopeStatisticInTerm(Builder $query, $column = 'created_at', $count_month = 3)
     {
-        $statistic_in_term = [];
         $key = 0;
 
         if (!in_array($count_month, [3, 6])) {
@@ -36,13 +37,15 @@ trait ScopeStatistics
             throw new Exception('Column Name Must Be String Given ' . $column);
         }
 
+        $one_query = $this->query();
         for ($i = 1; $i <= 12; $i +=  $count_month) {
             $key++;
             $array = implode("','", range($i, $i + $count_month - 1));
-            $statistic_in_term['term' . $key] = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->count();
+            $q = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->selectRaw('count(*)')->toSql();
+            $one_query->selectRaw('(' . $q . ') as ' . 'term' . $key);
         }
 
-        return $statistic_in_term;
+        return $one_query->first()->toArray();
     }
 
     public function ScopeStatisticInMonth(Builder $query, $column = 'created_at')
@@ -53,11 +56,14 @@ trait ScopeStatistics
             throw new Exception('Column Name Must Be String Given ' . $column);
         }
 
+        $one_query = $this->query();
         foreach ($months as $key => $value) {
-            $$value = $query->clone()->whereMonth($column, $key + 1)->count();
+            $new_key = $key + 1;
+            $q = $query->clone()->whereRaw("MONTH(" . $column . ") = $new_key")->selectRaw('count(*)')->toSql();
+            $one_query->selectRaw('(' . $q . ') as ' . $value);
         }
 
-        return compact($months);
+        return $one_query->first()->toArray();
     }
 
     public function ScopeStatisticInHour(Builder $query, $column = 'created_at', $count_hours = 6)
@@ -81,13 +87,20 @@ trait ScopeStatistics
 
 
 
+        $one_query = $this->query();
+        $init_key = 0;
+        $array_keys = [];
         foreach ($times as $key => $value) {
             if ($key % 2 == 0) {
-                $new_key = $value . '-' . $times[$key + 1];
-                $time[$new_key] = $query->clone()->whereTime($column, '>=', $value)->whereTime($column, '<=', $times[$key + 1])->count();
+                $end_time = $times[$key + 1];
+                $new_key = 'key' . $init_key;
+                $array_keys[$new_key] = $value . "-" . $end_time;
+                $q = $query->clone()->whereRaw("time(" . $column . ") >= '$value' and time(" . $column . ") <= '$end_time'")->selectRaw('count(*)')->toSql();
+                $one_query->selectRaw('(' . $q . ') as ' . $new_key);
+                $init_key++;
             }
         }
 
-        return $time;
+        return array_combine($array_keys, $one_query->first()->toArray());
     }
 }
