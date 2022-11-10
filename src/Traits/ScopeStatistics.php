@@ -18,7 +18,8 @@ trait ScopeStatistics
 
         $one_query = $this->query();
         foreach ($days as $key => $value) {
-            $q = $query->clone()->whereRaw('WEEKDAY(' . $column . ') = ' . $key)->selectRaw('count(*)')->toSql();
+            $query_sql = $query->clone()->whereRaw('WEEKDAY(' . $column . ') = ' . $key)->selectRaw('count(*)')->toSql();
+            $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . $value);
         }
 
@@ -41,7 +42,8 @@ trait ScopeStatistics
         for ($i = 1; $i <= 12; $i +=  $count_month) {
             $key++;
             $array = implode("','", range($i, $i + $count_month - 1));
-            $q = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->selectRaw('count(*)')->toSql();
+            $query_sql = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->selectRaw('count(*)')->toSql();
+            $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . 'term' . $key);
         }
 
@@ -59,7 +61,8 @@ trait ScopeStatistics
         $one_query = $this->query();
         foreach ($months as $key => $value) {
             $new_key = $key + 1;
-            $q = $query->clone()->whereRaw("MONTH(" . $column . ") = $new_key")->selectRaw('count(*)')->toSql();
+            $query_sql = $query->clone()->whereRaw("MONTH(" . $column . ") = $new_key")->selectRaw('count(*)')->toSql();
+            $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . $value);
         }
 
@@ -95,7 +98,8 @@ trait ScopeStatistics
                 $end_time = $times[$key + 1];
                 $new_key = 'key' . $init_key;
                 $array_keys[$new_key] = $value . "-" . $end_time;
-                $q = $query->clone()->whereRaw("time(" . $column . ") >= '$value' and time(" . $column . ") <= '$end_time'")->selectRaw('count(*)')->toSql();
+                $query_sql = $query->clone()->whereRaw("time(" . $column . ") >= '$value' and time(" . $column . ") <= '$end_time'")->selectRaw('count(*)')->toSql();
+                $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
                 $one_query->selectRaw('(' . $q . ') as ' . $new_key);
                 $init_key++;
             }
