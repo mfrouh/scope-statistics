@@ -11,6 +11,7 @@ trait ScopeStatistics
     public function ScopeStatisticInDay(Builder $query, $column = 'created_at')
     {
         $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        $array_model = [];
 
         if (is_int($column)) {
             throw new Exception('Column Name Must Be String Given ' . $column);
@@ -21,14 +22,16 @@ trait ScopeStatistics
             $query_sql = $query->clone()->whereRaw('WEEKDAY(' . $column . ') = ' . $key)->selectRaw('count(*)')->toSql();
             $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . $value);
+            $array_model[$value] = 0;
         }
 
-        return $one_query->first()->toArray();
+        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
     }
 
     public function ScopeStatisticInTerm(Builder $query, $column = 'created_at', $count_month = 3)
     {
         $key = 0;
+        $array_model = [];
 
         if (!in_array($count_month, [3, 6])) {
             throw new Exception('Count Month Must Be 3 Or 6 Given ' . $count_month);
@@ -45,14 +48,17 @@ trait ScopeStatistics
             $query_sql = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->selectRaw('count(*)')->toSql();
             $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . 'term' . $key);
+            $array_model['term'.$key] = 0;
         }
 
-        return $one_query->first()->toArray();
+        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
     }
 
     public function ScopeStatisticInMonth(Builder $query, $column = 'created_at')
     {
         $months = ['january', 'february', 'march', 'april', 'may', 'june', 'july ', 'august', 'september', 'october', 'november', 'december'];
+
+        $array_model = [];
 
         if (is_int($column)) {
             throw new Exception('Column Name Must Be String Given ' . $column);
@@ -64,15 +70,17 @@ trait ScopeStatistics
             $query_sql = $query->clone()->whereRaw("MONTH(" . $column . ") = $new_key")->selectRaw('count(*)')->toSql();
             $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . $value);
+            $array_model[$value] = 0;
         }
 
-        return $one_query->first()->toArray();
+        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
     }
 
     public function ScopeStatisticInHour(Builder $query, $column = 'created_at', $count_hours = 6)
     {
         $current_hour = 0;
         $times = [];
+        $array_model = [];
 
         if ($count_hours > 24 || 24 % $count_hours != 0) {
             throw new Exception('Count Hours Must Be 1, 2, 3, 4, 6, 8, 12 Given ' . $count_hours);
@@ -101,10 +109,11 @@ trait ScopeStatistics
                 $query_sql = $query->clone()->whereRaw("time(" . $column . ") >= '$value' and time(" . $column . ") <= '$end_time'")->selectRaw('count(*)')->toSql();
                 $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
                 $one_query->selectRaw('(' . $q . ') as ' . $new_key);
+                $array_model[$new_key] = 0;
                 $init_key++;
             }
         }
 
-        return array_combine($array_keys, $one_query->first()->toArray());
+        return array_combine($array_keys, $one_query->first() ? $one_query->first()->toArray() : $array_model);
     }
 }
