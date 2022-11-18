@@ -157,3 +157,26 @@ $statistic_in_term =
 ]
 
 ```
+
+### 5- Statistic In One Query
+
+```php
+
+ $array = [
+     'completed_order' => Order::where('status', 'completed'),
+     'cancelled_order' => Order::where('status', 'cancelled'),
+ ];
+
+ $statistic_in_one_query = Order::statisticInTerm($array);
+
+
+// response will be 100 Order
+
+$statistic_in_one_query =
+[
+  "completed_order" => 0
+  "cancelled_order" => 0
+
+]
+
+```

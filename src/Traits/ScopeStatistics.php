@@ -48,7 +48,7 @@ trait ScopeStatistics
             $query_sql = $query->clone()->whereRaw("MONTH(" . $column . ") In ('" . $array . "')")->selectRaw('count(*)')->toSql();
             $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $query->getBindings());
             $one_query->selectRaw('(' . $q . ') as ' . 'term' . $key);
-            $array_model['term'.$key] = 0;
+            $array_model['term' . $key] = 0;
         }
 
         return $one_query->first() ? $one_query->first()->toArray() : $array_model;
@@ -115,5 +115,21 @@ trait ScopeStatistics
         }
 
         return array_combine($array_keys, $one_query->first() ? $one_query->first()->toArray() : $array_model);
+    }
+
+    public function ScopeStatisticInOneQuery(Builder $query, array $queries)
+    {
+        $array_model = [];
+
+        $one_query = $this->query();
+
+        foreach ($queries as $key => $value) {
+            $query_sql = $value->selectRaw('count(*)')->toSql();
+            $q = vsprintf(str_replace(['?'], ['\'%s\''], $query_sql), $value->getBindings());
+            $one_query->selectRaw('(' . $q . ') as ' . $key);
+            $array_model[$key] = 0;
+        }
+
+        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
     }
 }
