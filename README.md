@@ -4,6 +4,10 @@
 
 #
 
+```bash
+ composer require mfrouh/scope-statistics
+```
+
 #### Add Trait in Your Model
 
 <br/>
