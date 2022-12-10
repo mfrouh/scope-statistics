@@ -4,6 +4,10 @@
 
 #
 
+```bash
+ composer require mfrouh/scope-statistics
+```
+
 #### Add Trait in Your Model
 
 <br/>
@@ -174,9 +178,8 @@ $statistic_in_term =
 
 $statistic_in_one_query =
 [
-  "completed_order" => 0
-  "cancelled_order" => 0
-
+  "completed_order" => 75
+  "cancelled_order" => 25
 ]
 
 ```
