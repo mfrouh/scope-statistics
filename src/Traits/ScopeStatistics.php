@@ -25,7 +25,9 @@ trait ScopeStatistics
             $array_model[$value] = 0;
         }
 
-        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
+        $first_query = $one_query->first();
+
+        return $first_query ? $first_query->toArray() : $array_model;
     }
 
     public function ScopeStatisticInTerm(Builder $query, $column = 'created_at', $count_month = 3)
@@ -51,7 +53,9 @@ trait ScopeStatistics
             $array_model['term' . $key] = 0;
         }
 
-        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
+        $first_query = $one_query->first();
+
+        return $first_query ? $first_query->toArray() : $array_model;
     }
 
     public function ScopeStatisticInMonth(Builder $query, $column = 'created_at')
@@ -73,7 +77,9 @@ trait ScopeStatistics
             $array_model[$value] = 0;
         }
 
-        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
+        $first_query = $one_query->first();
+
+        return $first_query ? $first_query->toArray() : $array_model;
     }
 
     public function ScopeStatisticInHour(Builder $query, $column = 'created_at', $count_hours = 6)
@@ -114,7 +120,9 @@ trait ScopeStatistics
             }
         }
 
-        return array_combine($array_keys, $one_query->first() ? $one_query->first()->toArray() : $array_model);
+        $first_query = $one_query->first();
+
+        return array_combine($array_keys, $first_query ? $first_query->toArray() : $array_model);
     }
 
     public function ScopeStatisticInOneQuery(Builder $query, array $queries)
@@ -130,6 +138,8 @@ trait ScopeStatistics
             $array_model[$key] = 0;
         }
 
-        return $one_query->first() ? $one_query->first()->toArray() : $array_model;
+        $first_query = $one_query->first();
+
+        return $first_query ? $first_query->toArray() : $array_model;
     }
 }
