@@ -171,7 +171,7 @@ $statistic_in_term =
      'cancelled_order' => Order::where('status', 'cancelled'),
  ];
 
- $statistic_in_one_query = Order::statisticInTerm($array);
+ $statistic_in_one_query = Order::statisticInOneQuery($array);
 
 
 // response will be 100 Order
